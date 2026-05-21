@@ -4,11 +4,11 @@
   "description": "Chat to Code - Professional AI Code Generator Desktop App",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
-    "build": "electron-builder",
-    "build:win32": "electron-builder --win --ia32",
-    "build:win64": "electron-builder --win --x64",
-    "build:win": "electron-builder --win --ia32 --x64"
+    "start": "npx electron .",
+    "build": "npx electron-builder",
+    "build:win32": "npx electron-builder --win --ia32",
+    "build:win64": "npx electron-builder --win --x64",
+    "build:win": "npx electron-builder --win --ia32 --x64"
   },
   "author": "ZSA AI",
   "license": "MIT",
