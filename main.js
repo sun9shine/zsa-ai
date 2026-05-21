@@ -10,7 +10,9 @@ const store = new Store({
   defaults: {
     models: [],
     activeModelId: null,
-    windowBounds: { width: 1400, height: 900 }
+    windowBounds: { width: 1400, height: 900 },
+    chatHistory: [],
+    language: 'ar'
   }
 });
 
@@ -95,6 +97,10 @@ ipcMain.handle('store:get', (event, key) => {
 
 ipcMain.handle('store:set', (event, key, value) => {
   store.set(key, value);
+});
+
+ipcMain.handle('store:delete', (event, key) => {
+  store.delete(key);
 });
 
 // ============ AI API CALL ============
