@@ -369,39 +369,41 @@ IMPORTANT RULES:
 
     let url, headers, body;
 
-    switch (model.provider) {
-      case 'openai':
-        url = (model.baseUrl || 'https://api.openai.com/v1') + '/chat/completions';
-        headers = { 'Content-Type': 'application/json', 'Authorization': `Bearer ${model.apiKey}` };
-        body = { model: model.model, messages, temperature: 0.7 };
-        break;
-      case 'anthropic':
-        url = (model.baseUrl || 'https://api.anthropic.com/v1') + '/messages';
-        headers = { 'Content-Type': 'application/json', 'x-api-key': model.apiKey, 'anthropic-version': '2023-06-01' };
-        const aMsgs = messages.filter(m => m.role !== 'system').map(m => ({ role: m.role, content: m.content }));
-        body = { model: model.model, system: systemPrompt, messages: aMsgs, max_tokens: 100000 };
-        break;
-      case 'ollama':
-        url = (model.baseUrl || 'http://localhost:11434') + '/api/chat';
-        headers = { 'Content-Type': 'application/json' };
-        body = { model: model.model, messages, stream: false };
-        break;
-      case 'custom':
-        url = (model.baseUrl || '') + '/chat/completions';
-        headers = { 'Content-Type': 'application/json', ...(model.apiKey ? { 'Authorization': `Bearer ${model.apiKey}` } : {}) };
-        body = { model: model.model, messages, temperature: 0.7 };
-        break;
-      default: throw new Error('Unsupported provider');
+    // Universal provider support - works with any AI model
+    const isAnthropic = model.provider === 'anthropic' || (model.baseUrl && model.baseUrl.includes('anthropic'));
+    const isOllama = model.provider === 'ollama' || (model.baseUrl && (model.baseUrl.includes('11434') || model.baseUrl.includes('ollama')));
+
+    let url, headers, body;
+
+    if (isAnthropic) {
+      // Anthropic format
+      url = (model.baseUrl || 'https://api.anthropic.com/v1') + '/messages';
+      headers = { 'Content-Type': 'application/json', 'x-api-key': model.apiKey || '', 'anthropic-version': '2023-06-01' };
+      const aMsgs = messages.filter(m => m.role !== 'system').map(m => ({ role: m.role, content: m.content }));
+      body = { model: model.model, system: systemPrompt, messages: aMsgs };
+    } else if (isOllama) {
+      // Ollama format
+      url = (model.baseUrl || 'http://localhost:11434') + '/api/chat';
+      headers = { 'Content-Type': 'application/json' };
+      body = { model: model.model, messages, stream: false };
+    } else {
+      // OpenAI-compatible format (works with OpenAI, DeepSeek, Groq, Together, Mistral, LM Studio, LocalAI, vLLM, any OpenAI-compatible endpoint)
+      url = (model.baseUrl || 'https://api.openai.com/v1') + '/chat/completions';
+      headers = { 'Content-Type': 'application/json' };
+      if (model.apiKey) headers['Authorization'] = `Bearer ${model.apiKey}`;
+      body = { model: model.model, messages, temperature: 0.7 };
     }
 
     const result = await window.electronAPI.callAI({ url, method: 'POST', headers, body });
     if (result.error) throw new Error(result.message || 'API call failed');
 
-    switch (model.provider) {
-      case 'openai': case 'custom': return result.data.choices[0].message.content;
-      case 'anthropic': return result.data.content[0].text;
-      case 'ollama': return result.data.message.content;
-      default: return '';
+    // Universal response parsing
+    if (isAnthropic) {
+      return result.data.content[0].text;
+    } else if (isOllama) {
+      return result.data.message.content;
+    } else {
+      return result.data.choices[0].message.content;
     }
   }
 
@@ -497,8 +499,8 @@ IMPORTANT RULES:
       btn.addEventListener('click', () => {
         document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active');
         const provider = document.getElementById('model-provider'); const apiKeyRow = document.getElementById('api-key-row');
-        if (btn.dataset.type === 'local') { provider.innerHTML = '<option value="ollama">Ollama</option><option value="custom">Custom Local</option>'; apiKeyRow.classList.add('hidden'); }
-        else { provider.innerHTML = '<option value="openai">OpenAI</option><option value="anthropic">Anthropic</option><option value="custom">Custom (OpenAI Compatible)</option>'; apiKeyRow.classList.remove('hidden'); }
+        if (btn.dataset.type === 'local') { provider.innerHTML = '<option value="ollama">Ollama</option><option value="openai-compatible">OpenAI Compatible</option><option value="custom">Other</option>'; apiKeyRow.classList.add('hidden'); }
+        else { provider.innerHTML = '<option value="openai-compatible">OpenAI Compatible (OpenAI, DeepSeek, Groq, Together, Mistral...)</option><option value="anthropic">Anthropic (Claude)</option><option value="ollama">Ollama</option><option value="custom">Other</option>'; apiKeyRow.classList.remove('hidden'); }
       });
     });
   }
