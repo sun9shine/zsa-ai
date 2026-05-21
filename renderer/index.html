@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com; connect-src *; img-src * data:; frame-src *;">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com; connect-src *; img-src * data: file:; frame-src *;">
   <title>ZSA AI - Chat to Code</title>
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -39,9 +39,21 @@
     <div id="chat-panel">
       <div id="chat-header">
         <div class="chat-header-left">
-          <div class="model-indicator" id="model-indicator">
-            <div class="model-dot"></div>
-            <span id="active-model-name">No Model</span>
+          <!-- Model Switcher -->
+          <div class="model-switcher" id="model-switcher">
+            <button id="btn-model-switcher" class="model-switcher-btn" title="Switch Model">
+              <div class="model-dot"></div>
+              <span id="active-model-name">No Model</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6,9 12,15 18,9"/></svg>
+            </button>
+            <div id="model-dropdown" class="model-dropdown hidden">
+              <div class="model-dropdown-header">Switch Model</div>
+              <div id="model-dropdown-list"></div>
+              <button id="btn-dropdown-settings" class="model-dropdown-add">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+                Manage Models
+              </button>
+            </div>
           </div>
         </div>
         <div class="chat-header-right">
@@ -69,20 +81,55 @@
             </svg>
           </div>
           <h1>ZSA AI</h1>
-          <p>Describe what you want to build and I'll generate the code with a live preview</p>
+          <p>Build complete platforms, mobile apps, web apps, and more from a simple description</p>
           <div class="suggestions">
-            <button class="suggestion-btn" data-prompt="Build a modern landing page with animated hero section">Landing page with animations</button>
-            <button class="suggestion-btn" data-prompt="Create a dashboard with charts and statistics cards">Dashboard with charts</button>
-            <button class="suggestion-btn" data-prompt="Design a login and registration form with validation">Login & Registration form</button>
-            <button class="suggestion-btn" data-prompt="Build a todo app with drag and drop functionality">Todo app with drag & drop</button>
+            <button class="suggestion-btn" data-prompt="Build a complete e-commerce platform with product listing, cart, checkout, and admin panel">
+              <span class="suggestion-icon">🛒</span>
+              E-Commerce Platform
+            </button>
+            <button class="suggestion-btn" data-prompt="Create a mobile app UI for a social media platform with feed, stories, chat, and profile">
+              <span class="suggestion-icon">📱</span>
+              Mobile App UI
+            </button>
+            <button class="suggestion-btn" data-prompt="Build a full web application dashboard with authentication, charts, tables, and settings">
+              <span class="suggestion-icon">📊</span>
+              Web App Dashboard
+            </button>
+            <button class="suggestion-btn" data-prompt="Design a complete portfolio website with projects gallery, blog, contact form, and animations">
+              <span class="suggestion-icon">🎨</span>
+              Portfolio Website
+            </button>
+            <button class="suggestion-btn" data-prompt="Create a real-time chat application with rooms, user list, typing indicators, and file sharing UI">
+              <span class="suggestion-icon">💬</span>
+              Chat Application
+            </button>
+            <button class="suggestion-btn" data-prompt="Build a project management tool like Trello with boards, lists, cards, drag-and-drop, and team views">
+              <span class="suggestion-icon">📋</span>
+              Project Management
+            </button>
           </div>
         </div>
         <!-- Messages will be inserted here -->
       </div>
 
+      <!-- Attachments Preview -->
+      <div id="attachments-preview" class="hidden">
+        <div id="attachments-list"></div>
+      </div>
+
       <div id="chat-input-area">
         <div id="chat-input-container">
-          <textarea id="chat-input" placeholder="Describe what you want to build..." rows="1"></textarea>
+          <button id="btn-attach" class="attach-btn" title="Attach files, images, or projects">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/>
+            </svg>
+          </button>
+          <button id="btn-attach-folder" class="attach-btn" title="Attach project folder">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
+            </svg>
+          </button>
+          <textarea id="chat-input" placeholder="Describe what you want to build... (platforms, mobile apps, web apps)" rows="1"></textarea>
           <button id="btn-send" class="send-btn" disabled>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
@@ -130,7 +177,7 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           </button>
           <button id="btn-download-zip" class="icon-btn small" title="Download as ZIP">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/><rect x="8" y="2" width="8" height="4" rx="1" stroke="currentColor" fill="none"/><path d="M10 6v2m4-2v2" stroke="currentColor"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/><rect x="8" y="2" width="8" height="4" rx="1" stroke="currentColor" fill="none"/></svg>
           </button>
         </div>
       </div>
