@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src *; img-src * data: file:;">
+  <title>ZSA AI - Admin Dashboard</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <!-- Custom Title Bar -->
+  <div id="titlebar">
+    <div class="titlebar-drag">
+      <div class="titlebar-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <span class="titlebar-title">ZSA AI — Admin Dashboard</span>
+    </div>
+    <div class="titlebar-controls">
+      <button id="btn-minimize" class="titlebar-btn" title="Minimize">
+        <svg width="12" height="12" viewBox="0 0 12 12"><rect y="5" width="12" height="1.5" fill="currentColor"/></svg>
+      </button>
+      <button id="btn-maximize" class="titlebar-btn" title="Maximize">
+        <svg width="12" height="12" viewBox="0 0 12 12"><rect x="1" y="1" width="10" height="10" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+      </button>
+      <button id="btn-close" class="titlebar-btn btn-close" title="Close">
+        <svg width="12" height="12" viewBox="0 0 12 12"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.5"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Login Screen -->
+  <div id="login-screen">
+    <div class="login-card">
+      <div class="login-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <h2>Admin Login</h2>
+      <p class="login-subtitle">Enter your credentials to access the dashboard</p>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="login-username" placeholder="Enter username" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="Enter password">
+      </div>
+      <button class="login-btn" id="btn-login">Sign In</button>
+      <p class="login-error" id="login-error">Invalid username or password</p>
+    </div>
+  </div>
+
+  <!-- Admin Layout (hidden until login) -->
+  <div id="admin-layout" class="hidden">
+    <!-- Sidebar -->
+    <aside id="sidebar">
+      <div class="sidebar-header">
+        <h3>Admin Panel</h3>
+        <button class="sidebar-toggle" id="btn-sidebar-toggle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        </button>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="sidebar-nav-item active" data-page="dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          <span class="sidebar-label">Dashboard</span>
+        </button>
+        <button class="sidebar-nav-item" data-page="platform">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          <span class="sidebar-label">Platform Settings</span>
+        </button>
+        <button class="sidebar-nav-item" data-page="models">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27,6.96 12,12.01 20.73,6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          <span class="sidebar-label">Models</span>
+        </button>
+        <button class="sidebar-nav-item" data-page="pricing">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          <span class="sidebar-label">Pricing</span>
+        </button>
+        <button class="sidebar-nav-item" data-page="pages">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span class="sidebar-label">Pages</span>
+        </button>
+        <button class="sidebar-nav-item" data-page="smtp">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span class="sidebar-label">SMTP</span>
+        </button>
+        <button class="sidebar-nav-item" data-page="users">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          <span class="sidebar-label">Users</span>
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="back-btn" id="btn-back-app">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15,18 9,12 15,6"/></svg>
+          <span class="sidebar-footer-text">Back to App</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main id="main-content">
+      <!-- Dashboard Page -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <h1>Dashboard</h1>
+          <p>Welcome to the ZSA AI Admin Panel</p>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon purple">🤖</div>
+            <div class="stat-value" id="stat-models">0</div>
+            <div class="stat-label">AI Models</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">👥</div>
+            <div class="stat-value" id="stat-users">0</div>
+            <div class="stat-label">Users</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon orange">💰</div>
+            <div class="stat-value" id="stat-plans">0</div>
+            <div class="stat-label">Pricing Plans</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon red">📄</div>
+            <div class="stat-value" id="stat-pages">0</div>
+            <div class="stat-label">Pages</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3>Quick Actions</h3>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="admin.navigate('platform')">Platform Settings</button>
+            <button class="btn btn-secondary" onclick="admin.navigate('models')">Manage Models</button>
+            <button class="btn btn-secondary" onclick="admin.navigate('users')">View Users</button>
+            <button class="btn btn-secondary" id="btn-change-password">Change Password</button>
+            <button class="btn btn-danger" id="btn-logout">Logout</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Platform Settings Page -->
+      <div class="page" id="page-platform">
+        <div class="page-header">
+          <h1>Platform Settings</h1>
+          <p>Configure your platform name, description, and appearance</p>
+        </div>
+        <div class="card">
+          <div class="form-group">
+            <label>Platform Name</label>
+            <input type="text" id="platform-name" placeholder="ZSA AI">
+          </div>
+          <div class="form-group">
+            <label>Platform Description / Tagline</label>
+            <input type="text" id="platform-description" placeholder="Chat to Code - Professional AI Code Generator">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Accent Color</label>
+              <input type="color" id="platform-color" value="#6366f1">
+            </div>
+            <div class="form-group">
+              <label>Default Language</label>
+              <select id="platform-language">
+                <option value="ar">Arabic (AR)</option>
+                <option value="en">English (EN)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" id="btn-save-platform">Save Settings</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Models Page -->
+      <div class="page" id="page-models">
+        <div class="page-header">
+          <h1>AI Models</h1>
+          <p>Manage configured AI models for the platform</p>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3>Configured Models</h3>
+            <button class="btn btn-primary btn-sm" id="btn-add-model">+ Add Model</button>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Provider</th>
+                  <th>Model</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="models-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pricing Page -->
+      <div class="page" id="page-pricing">
+        <div class="page-header">
+          <h1>Pricing Plans</h1>
+          <p>Manage subscription plans and payment gateways</p>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3>Plans</h3>
+            <button class="btn btn-primary btn-sm" id="btn-add-plan">+ Add Plan</button>
+          </div>
+          <div id="plans-list"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3>Payment Gateways</h3>
+          </div>
+          <div class="form-group">
+            <label>PayPal Client ID</label>
+            <input type="text" id="gateway-paypal" placeholder="Enter PayPal Client ID">
+          </div>
+          <div class="form-group">
+            <label>Stripe Public Key</label>
+            <input type="text" id="gateway-stripe" placeholder="Enter Stripe Public Key">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Custom Gateway Name</label>
+              <input type="text" id="gateway-custom-name" placeholder="e.g. Paddle">
+            </div>
+            <div class="form-group">
+              <label>Custom Gateway URL</label>
+              <input type="text" id="gateway-custom-url" placeholder="https://...">
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" id="btn-save-gateways">Save Gateways</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pages Page -->
+      <div class="page" id="page-pages">
+        <div class="page-header">
+          <h1>Pages</h1>
+          <p>Edit platform pages content</p>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Privacy Policy</h3></div>
+          <div class="form-group">
+            <textarea id="page-privacy" placeholder="Enter Privacy Policy content..."></textarea>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>About Us</h3></div>
+          <div class="form-group">
+            <textarea id="page-about" placeholder="Enter About Us content..."></textarea>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Terms of Service</h3></div>
+          <div class="form-group">
+            <textarea id="page-terms" placeholder="Enter Terms of Service content..."></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="btn-save-pages">Save All Pages</button>
+        </div>
+      </div>
+
+      <!-- SMTP Page -->
+      <div class="page" id="page-smtp">
+        <div class="page-header">
+          <h1>SMTP Settings</h1>
+          <p>Configure email sending settings</p>
+        </div>
+        <div class="card">
+          <div class="form-row">
+            <div class="form-group">
+              <label>SMTP Host</label>
+              <input type="text" id="smtp-host" placeholder="smtp.example.com">
+            </div>
+            <div class="form-group">
+              <label>SMTP Port</label>
+              <input type="number" id="smtp-port" placeholder="587">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Username</label>
+              <input type="text" id="smtp-username" placeholder="user@example.com">
+            </div>
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" id="smtp-password" placeholder="••••••••">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>From Email</label>
+              <input type="email" id="smtp-from-email" placeholder="noreply@example.com">
+            </div>
+            <div class="form-group">
+              <label>From Name</label>
+              <input type="text" id="smtp-from-name" placeholder="ZSA AI">
+            </div>
+          </div>
+          <div class="form-group" style="display:flex;align-items:center;gap:12px;">
+            <label style="margin-bottom:0;">TLS/SSL</label>
+            <label class="toggle">
+              <input type="checkbox" id="smtp-tls" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" id="btn-save-smtp">Save SMTP</button>
+            <button class="btn btn-success" id="btn-test-smtp">Send Test Email</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users Page -->
+      <div class="page" id="page-users">
+        <div class="page-header">
+          <h1>Users</h1>
+          <p>Manage platform users</p>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3>User List</h3>
+            <button class="btn btn-primary btn-sm" id="btn-add-user">+ Add User</button>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Plan</th>
+                  <th>Status</th>
+                  <th>Joined</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Usage Statistics</h3></div>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon green">✅</div>
+              <div class="stat-value" id="stat-active-users">0</div>
+              <div class="stat-label">Active Users</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon orange">⭐</div>
+              <div class="stat-value" id="stat-pro-users">0</div>
+              <div class="stat-label">Pro Users</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon red">🚫</div>
+              <div class="stat-value" id="stat-inactive-users">0</div>
+              <div class="stat-label">Inactive Users</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Overlay (for add/edit) -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box" id="modal-box"></div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

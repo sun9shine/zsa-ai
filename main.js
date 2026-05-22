@@ -12,7 +12,20 @@ const store = new Store({
     activeModelId: null,
     windowBounds: { width: 1400, height: 900 },
     chatHistory: [],
-    language: 'ar'
+    language: 'ar',
+    'admin.password': null,
+    'admin.session': { loggedIn: false },
+    'admin.platform': {
+      name: 'ZSA AI',
+      description: 'Chat to Code - Professional AI Code Generator',
+      color: '#6366f1',
+      language: 'ar'
+    },
+    'admin.pricing': [],
+    'admin.pages': { privacy: '', about: '', terms: '' },
+    'admin.smtp': { host: '', port: 587, username: '', password: '', fromEmail: '', fromName: '', tls: true },
+    'admin.users': [],
+    'admin.gateways': { paypal: '', stripe: '', customName: '', customUrl: '' }
   }
 });
 
@@ -268,3 +281,19 @@ function readDirRecursive(dirPath, currentDepth, maxDepth) {
 
   return result;
 }
+
+
+
+// ============ ADMIN IPC ============
+
+ipcMain.handle('admin:open', () => {
+  if (mainWindow) {
+    mainWindow.loadFile(path.join(__dirname, 'renderer', 'admin.html'));
+  }
+});
+
+ipcMain.handle('admin:backToApp', () => {
+  if (mainWindow) {
+    mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
+  }
+});

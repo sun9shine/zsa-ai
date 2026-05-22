@@ -12,6 +12,7 @@ Professional desktop application that generates code from natural language using
 - **Live Preview** — See your generated code rendered in real-time
 - **Editable Code Editor** — Edit code directly with live preview updates
 - **Split View** — See code and preview side-by-side
+- **Admin Dashboard** — Full platform management panel (models, pricing, users, pages, SMTP)
 - **Any AI Model** — OpenAI, Anthropic, Ollama, OpenRouter, DeepSeek, Groq, Together, Mistral, LM Studio, and any OpenAI-compatible endpoint
 - **File Attachments** — Upload images, code files, or entire project folders
 - **Image-to-Code (Vision)** — Attach mockups and AI converts them to code
@@ -192,16 +193,42 @@ ollama pull llama3.1
 
 ---
 
+## Admin Dashboard
+
+The app includes a full admin panel for platform management. Access it via the **Admin** button in the titlebar.
+
+### Default Admin Credentials
+
+| Field    | Value      |
+|----------|------------|
+| Username | `admin`    |
+| Password | `admin123` |
+
+### Admin Features
+
+- **Platform Settings** — Change app name, description, accent color, default language
+- **Models Management** — Add/edit/delete AI models, set default
+- **Pricing Plans** — Create subscription plans with features, set payment gateways (PayPal, Stripe, custom)
+- **Pages Editor** — Edit Privacy Policy, About Us, Terms of Service
+- **SMTP Settings** — Configure email sending (host, port, TLS)
+- **Users Management** — Add mock users, change plans, toggle active/inactive status
+- **Password Management** — Change admin password from the dashboard
+
+---
+
 ## Architecture
 
 ```
 zsa-ai/
-├── main.js           # Electron main process (native fetch, file dialogs)
-├── preload.js        # Secure IPC bridge
+├── main.js           # Electron main process (native fetch, file dialogs, admin IPC)
+├── preload.js        # Secure IPC bridge (includes openAdmin)
 ├── renderer/
 │   ├── index.html    # Main UI (modals, panels, buttons)
 │   ├── styles.css    # Professional dark/light theme
-│   └── app.js        # Application logic (1400+ lines)
+│   ├── app.js        # Application logic (1400+ lines)
+│   ├── admin.html    # Admin Dashboard UI
+│   ├── admin.css     # Admin Dashboard styles
+│   └── admin.js      # Admin Dashboard logic
 ├── assets/           # App icons
 ├── package.json      # Config & build settings
 └── README.md         # This file

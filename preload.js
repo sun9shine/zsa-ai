@@ -21,5 +21,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   readFileAsText: (filePath) => ipcRenderer.invoke('file:readText', filePath),
   getFileInfo: (filePath) => ipcRenderer.invoke('file:getInfo', filePath),
   openFolderDialog: () => ipcRenderer.invoke('dialog:openFolder'),
-  readFolderStructure: (folderPath) => ipcRenderer.invoke('folder:readStructure', folderPath)
+  readFolderStructure: (folderPath) => ipcRenderer.invoke('folder:readStructure', folderPath),
+
+  // Admin
+  openAdmin: () => ipcRenderer.invoke('admin:open'),
+  openMainApp: () => ipcRenderer.invoke('admin:backToApp')
 });
