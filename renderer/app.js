@@ -1315,11 +1315,26 @@ IMPORTANT RULES:
       const isActive = model.id === this.activeModelId;
       const div = document.createElement('div'); div.className = `model-item ${isActive ? 'active' : ''}`;
       const icon = model.type === 'local' ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><circle cx="6" cy="6" r="1"/><circle cx="6" cy="18" r="1"/></svg>' : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/></svg>';
-      div.innerHTML = `<div class="model-item-left"><div class="model-item-icon ${model.type === 'local' ? 'local' : 'online'}">${icon}</div><div class="model-item-info"><h4>${this.escapeHtml(model.name)}</h4><p>${model.provider} / ${model.model}</p></div></div><div class="model-item-actions">${isActive ? '<span class="badge badge-active">Active</span>' : `<button class="badge badge-activate" data-id="${model.id}">Activate</button>`}<button class="btn-delete" data-id="${model.id}" title="Delete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button></div>`;
+      div.innerHTML = `<div class="model-item-left"><div class="model-item-icon ${model.type === 'local' ? 'local' : 'online'}">${icon}</div><div class="model-item-info"><h4>${this.escapeHtml(model.name)}</h4><p>${model.provider} / ${model.model}</p></div></div><div class="model-item-actions">${isActive ? '<span class="badge badge-active">Active</span>' : `<button class="badge badge-activate" data-id="${model.id}">Activate</button>`}<button class="btn-edit" data-id="${model.id}" title="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button><button class="btn-delete" data-id="${model.id}" title="Delete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3,6 5,6 21,6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button></div>`;
       list.appendChild(div);
     });
     list.querySelectorAll('.badge-activate').forEach(btn => { btn.addEventListener('click', () => { this.activeModelId = btn.dataset.id; this.saveModels(); this.renderModelsList(); this.updateModelIndicator(); this.showToast('Model activated', 'success'); }); });
+    list.querySelectorAll('.btn-edit').forEach(btn => { btn.addEventListener('click', () => { this.editModel(btn.dataset.id); }); });
     list.querySelectorAll('.btn-delete').forEach(btn => { btn.addEventListener('click', () => { this.models = this.models.filter(m => m.id !== btn.dataset.id); if (this.activeModelId === btn.dataset.id) this.activeModelId = this.models.length > 0 ? this.models[0].id : null; this.saveModels(); this.renderModelsList(); this.updateModelIndicator(); }); });
+  }
+
+  editModel(modelId) {
+    const model = this.models.find(m => m.id === modelId);
+    if (!model) return;
+    // Show the form pre-filled with model data
+    document.getElementById('add-model-form').classList.remove('hidden');
+    document.getElementById('btn-add-model').classList.add('hidden');
+    document.getElementById('model-name').value = model.name || '';
+    document.getElementById('model-model').value = model.model || '';
+    document.getElementById('model-url').value = model.baseUrl || '';
+    document.getElementById('model-key').value = model.apiKey || '';
+    // Set editing flag
+    this._editingModelId = modelId;
   }
 
   async saveNewModel() {
@@ -1330,18 +1345,32 @@ IMPORTANT RULES:
     const apiKey = document.getElementById('model-key').value.trim();
     const type = document.querySelector('.type-btn.active').dataset.type;
     if (!name || !model) { this.showToast('Please fill in name and model fields', 'error'); return; }
-    const newModel = { id: Date.now().toString(), name, model, provider, baseUrl: baseUrl || undefined, apiKey: apiKey || undefined, type, isActive: true };
-    this.models.push(newModel);
-    if (!this.activeModelId) this.activeModelId = newModel.id;
+
+    if (this._editingModelId) {
+      // Update existing model
+      const idx = this.models.findIndex(m => m.id === this._editingModelId);
+      if (idx !== -1) {
+        this.models[idx] = { ...this.models[idx], name, model, provider, baseUrl: baseUrl || undefined, apiKey: apiKey || undefined, type };
+      }
+      this._editingModelId = null;
+      this.showToast('Model updated successfully', 'success');
+    } else {
+      // Add new model
+      const newModel = { id: Date.now().toString(), name, model, provider, baseUrl: baseUrl || undefined, apiKey: apiKey || undefined, type, isActive: true };
+      this.models.push(newModel);
+      if (!this.activeModelId) this.activeModelId = newModel.id;
+      this.showToast('Model added successfully', 'success');
+    }
+
     await this.saveModels(); this.renderModelsList(); this.updateModelIndicator();
     document.getElementById('add-model-form').classList.add('hidden');
     document.getElementById('btn-add-model').classList.remove('hidden');
     this.resetModelForm();
-    this.showToast('Model added successfully', 'success');
   }
 
   resetModelForm() {
     ['model-name', 'model-model', 'model-url', 'model-key'].forEach(id => document.getElementById(id).value = '');
+    this._editingModelId = null;
   }
 
 

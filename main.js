@@ -107,7 +107,7 @@ ipcMain.handle('store:delete', (event, key) => {
 
 ipcMain.handle('ai:call', async (event, { url, method, headers, body }) => {
   try {
-    const fetch = (await import('node-fetch')).default;
+    // Use native fetch (available in Electron 28+/Node 18+)
     const response = await fetch(url, {
       method: method || 'POST',
       headers: headers || {},
